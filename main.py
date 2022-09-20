@@ -92,12 +92,10 @@ def get_weather(region):
 def get_tianhang():
     try:
         key = config["tian_api"]
-        # 早安
-        url = "http://api.tianapi.com/zaoan/index?key={}".format(key)
+        # 舔狗日记
+        url = "http://api.tianapi.com/tiangou/index?key={}".format(key)
         # 星座运势
         url2 = "http://api.tianapi.com/star/index?key={}&astro=天蝎座".format(key)
-        # 舔狗日记
-        url3 = "http://api.tianapi.com/tiangou/index?key={}".format(key)
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                           'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
@@ -106,20 +104,16 @@ def get_tianhang():
         }
         response = get(url, headers=headers).json()
         response2 = get(url2, headers=headers).json()
-        response3 = get(url3, headers=headers).json()
-        if response["code"] == 200 and response2["code"] == 200 and response3["code"] == 200:
+        if response["code"] == 200 and response2["code"] == 200:
             chp = response["newslist"][0]["content"]
             chp2 = response2["newslist"][8]["content"]
-            chp3 = response3["newslist"][0]["content"]
         else:
             chp = ""
             chp2 = ""
-            chp3 = ""
     except KeyError:
         chp = ""
         chp2 = ""
-        chp3 = ""
-    return chp, chp2, chp3
+    return chp, chp2
 
 
 def get_birthday(birthday, year, today):
@@ -173,7 +167,7 @@ def get_ciba():
 
 
 def send_message(to_user, access_token, region_name, weather, temp, wind_dir, note_ch, note_en, max_temp, min_temp,
-                 sunrise, sunset, category, pm2p5, proposal, chp, chp2, chp3):
+                 sunrise, sunset, category, pm2p5, proposal, chp, chp2):
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
     year = localtime().tm_year
@@ -267,10 +261,6 @@ def send_message(to_user, access_token, region_name, weather, temp, wind_dir, no
                 "value": chp2,
                 "color": get_color()
             },
-            "chp3": {
-                "value": chp3,
-                "color": get_color()
-            },
 
         }
     }
@@ -326,9 +316,9 @@ if __name__ == "__main__":
     if note_ch == "" and note_en == "":
         # 获取词霸每日金句
         note_ch, note_en = get_ciba()
-    chp, chp2, chp3 = get_tianhang()
+    chp, chp2 = get_tianhang()
     # 公众号推送消息
     for user in users:
         send_message(user, accessToken, region, weather, temp, wind_dir, note_ch, note_en, max_temp, min_temp, sunrise,
-                     sunset, category, pm2p5, proposal, chp, chp2, chp3)
+                     sunset, category, pm2p5, proposal, chp, chp2)
     os.system("pause")
